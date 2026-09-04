@@ -16,9 +16,11 @@ interface ChromePreviewFrameProps {
   onExportPdf?: (pageMode: ResumePdfPageMode) => void
   onExportWord?: () => void
   onExportMd?: () => void
+  onExportLatex?: () => void
   exporting?: boolean
   exportingWord?: boolean
   exportingMd?: boolean
+  exportingLatex?: boolean
   exportError?: string
 }
 
@@ -445,9 +447,11 @@ export function ChromePreviewFrame({
   onExportPdf,
   onExportWord,
   onExportMd,
+  onExportLatex,
   exporting = false,
   exportingWord = false,
   exportingMd = false,
+  exportingLatex = false,
   exportError = '',
 }: ChromePreviewFrameProps) {
   const [refreshKey, setRefreshKey] = useState(0)
@@ -530,6 +534,16 @@ export function ChromePreviewFrame({
                 className="shrink-0"
               >
                 导出 MD
+              </Button>
+            ) : null}
+            {onExportLatex ? (
+              <Button
+                type="button"
+                onClick={() => void onExportLatex()}
+                loading={exportingLatex}
+                className="shrink-0"
+              >
+                导出 LaTeX
               </Button>
             ) : null}
             {onExportWord ? (

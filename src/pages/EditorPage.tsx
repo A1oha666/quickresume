@@ -32,6 +32,7 @@ import {
 import { downloadResumeDocx } from '../utils/resumeDocx'
 import { restoreResumeFromFile, syncResumeToFileNow } from '../utils/resumeSync'
 import { downloadResumeMd } from '../utils/resumeMd'
+import { downloadResumeLatex } from '../utils/resumeLatex'
 
 type EditorView = 'module' | 'template-selection'
 const NON_REMOVABLE_MODULE_TYPES = new Set<ModuleType>(['basic_info'])
@@ -67,6 +68,7 @@ export default function EditorPage() {
   const [exporting, setExporting] = useState(false)
   const [exportingWord, setExportingWord] = useState(false)
   const [exportingMd, setExportingMd] = useState(false)
+  const [exportingLatex, setExportingLatex] = useState(false)
   const [exportError, setExportError] = useState('')
   const [syncingToFile, setSyncingToFile] = useState(false)
   const [syncNotice, setSyncNotice] = useState('')
@@ -541,6 +543,29 @@ export default function EditorPage() {
     }
   }, [modules.length, resumeId, resumeTitle])
 
+  const handleExportLatex = useCallback(async () => {
+    if (modules.length === 0) {
+      setExportError('请先完善简历内容后再导出 LaTeX')
+      return
+    }
+
+    setExportingLatex(true)
+    setExportError('')
+    try {
+      await flushResumeAutoSaves(resumeId)
+      const latestModules = useResumeStore.getState().modules
+      if (latestModules.length === 0) {
+        throw new Error('请先完善简历内容后再导出 LaTeX')
+      }
+      downloadResumeLatex(latestModules, resumeId, { documentTitle: resumeTitle })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '导出 LaTeX 失败，请稍后重试'
+      setExportError(message)
+    } finally {
+      setExportingLatex(false)
+    }
+  }, [modules.length, resumeId, resumeTitle])
+
   // ===== 简历文件同步（编辑内容 <-> md 文件）=====
   const handleSyncToFile = useCallback(async () => {
     if (modules.length === 0) {
@@ -778,8 +803,10 @@ export default function EditorPage() {
               onExportPdf={(pageMode) => void handleExportPdf(pageMode)}
               onExportWord={() => void handleExportWord()}
               onExportMd={() => void handleExportMd()}
+              onExportLatex={() => void handleExportLatex()}
               exportingWord={exportingWord}
               exportingMd={exportingMd}
+              exportingLatex={exportingLatex}
               exporting={exporting}
               exportError={exportError}
             />
