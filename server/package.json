@@ -1,0 +1,16 @@
+{
+  "name": "quick-resume-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QuickResume 单服务：前端静态托管 + 简历同步 + 健康检查",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
